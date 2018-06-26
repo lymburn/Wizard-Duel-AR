@@ -13,6 +13,9 @@
 		26511AFD20E19D1B00BD8295 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26511AFB20E19D1B00BD8295 /* Main.storyboard */; };
 		26511AFF20E19D1C00BD8295 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26511AFE20E19D1C00BD8295 /* Assets.xcassets */; };
 		26511B0220E19D1C00BD8295 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26511B0020E19D1C00BD8295 /* LaunchScreen.storyboard */; };
+		26511B0C20E1B81C00BD8295 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26511B0B20E1B81C00BD8295 /* Helpers.swift */; };
+		26511B1020E1E35900BD8295 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 26511B0E20E1E35900BD8295 /* spark.png */; };
+		26511B1120E1E35900BD8295 /* Fireball.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 26511B0F20E1E35900BD8295 /* Fireball.scnp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +27,9 @@
 		26511AFE20E19D1C00BD8295 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		26511B0120E19D1C00BD8295 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		26511B0320E19D1C00BD8295 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		26511B0B20E1B81C00BD8295 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		26511B0E20E1E35900BD8295 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
+		26511B0F20E1E35900BD8295 /* Fireball.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; path = Fireball.scnp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +62,7 @@
 		26511AF420E19D1B00BD8295 /* Wizard Duel AR */ = {
 			isa = PBXGroup;
 			children = (
+				26511B0D20E1E2C700BD8295 /* Particles */,
 				26511AF520E19D1B00BD8295 /* AppDelegate.swift */,
 				26511AF720E19D1B00BD8295 /* art.scnassets */,
 				26511AF920E19D1B00BD8295 /* ViewController.swift */,
@@ -63,8 +70,18 @@
 				26511AFE20E19D1C00BD8295 /* Assets.xcassets */,
 				26511B0020E19D1C00BD8295 /* LaunchScreen.storyboard */,
 				26511B0320E19D1C00BD8295 /* Info.plist */,
+				26511B0B20E1B81C00BD8295 /* Helpers.swift */,
 			);
 			path = "Wizard Duel AR";
+			sourceTree = "<group>";
+		};
+		26511B0D20E1E2C700BD8295 /* Particles */ = {
+			isa = PBXGroup;
+			children = (
+				26511B0E20E1E35900BD8295 /* spark.png */,
+				26511B0F20E1E35900BD8295 /* Fireball.scnp */,
+			);
+			path = Particles;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -125,9 +142,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26511B1020E1E35900BD8295 /* spark.png in Resources */,
 				26511AF820E19D1B00BD8295 /* art.scnassets in Resources */,
 				26511B0220E19D1C00BD8295 /* LaunchScreen.storyboard in Resources */,
 				26511AFF20E19D1C00BD8295 /* Assets.xcassets in Resources */,
+				26511B1120E1E35900BD8295 /* Fireball.scnp in Resources */,
 				26511AFD20E19D1B00BD8295 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -140,6 +159,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26511AFA20E19D1B00BD8295 /* ViewController.swift in Sources */,
+				26511B0C20E1B81C00BD8295 /* Helpers.swift in Sources */,
 				26511AF620E19D1B00BD8295 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
