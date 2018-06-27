@@ -19,6 +19,7 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var sceneView: ARSCNView!
     var target: SCNNode?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupWand()
@@ -49,12 +50,21 @@ class ViewController: UIViewController {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         //Draw channelling spell light
-        drawSpellLight()
+        let action = SCNAction.rotateBy(x: CGFloat(-15).degreesToRadians, y: 0, z: 0, duration: 0.2)
+        wandNode.runAction(action) {
+            let wandAngles = self.wandNode.eulerAngles
+            if CGFloat(wandAngles.x) < CGFloat(20.5).degreesToRadians {
+                self.drawSpellLight()
+            }
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         //Remove the spell light when user stops holding
         fireSpell()
+        let action = SCNAction.rotateTo(x: CGFloat(35).degreesToRadians, y: CGFloat(15).degreesToRadians, z: 0, duration: 0.2)
+        wandNode.runAction(action)
+        
     }
     
     var spell = SCNNode()
@@ -104,17 +114,18 @@ extension ViewController: SCNPhysicsContactDelegate {
 
 fileprivate extension ViewController {
     func drawSpellLight() {
+        
         //Draw a circle indicating a spell is being channelled
         spell = SCNNode()
-        spell.position = SCNVector3(0.01, -0.03, -0.8)
         spell.name = "spell light"
+        spell.pivot = SCNMatrix4MakeTranslation(0, 0, 140)
         spell.physicsBody?.categoryBitMask = BitMaskCategory.spell.rawValue
         spell.physicsBody?.contactTestBitMask = BitMaskCategory.target.rawValue
         
         let fire = SCNParticleSystem(named: "Fireball.scnp", inDirectory: nil)!
         fire.particleSize = 0.1
         spell.addParticleSystem(fire)
-        sceneView.pointOfView?.addChildNode(spell)
+        wandNode.addChildNode(spell)
     }
     
     //Fire a spell
@@ -124,6 +135,7 @@ fileprivate extension ViewController {
         //Apple force to spell
         let body = SCNPhysicsBody(type: .dynamic, shape: SCNPhysicsShape(node: spell, options: nil))
         body.isAffectedByGravity = false
+        spell.pivot = SCNMatrix4MakeTranslation(0, 0, 70)
         let force = SCNVector3(orientation.x*5, orientation.y*5, orientation.z*5)
         body.applyForce(force, asImpulse: true)
         body.friction = 0.0
