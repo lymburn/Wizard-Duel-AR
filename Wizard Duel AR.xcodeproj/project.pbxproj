@@ -16,6 +16,7 @@
 		26511B0C20E1B81C00BD8295 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26511B0B20E1B81C00BD8295 /* Helpers.swift */; };
 		26511B1020E1E35900BD8295 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 26511B0E20E1E35900BD8295 /* spark.png */; };
 		26511B1120E1E35900BD8295 /* Fireball.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 26511B0F20E1E35900BD8295 /* Fireball.scnp */; };
+		26511B1320E3111C00BD8295 /* Explosion.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 26511B1220E3111C00BD8295 /* Explosion.scnp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		26511B0B20E1B81C00BD8295 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		26511B0E20E1E35900BD8295 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		26511B0F20E1E35900BD8295 /* Fireball.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; path = Fireball.scnp; sourceTree = "<group>"; };
+		26511B1220E3111C00BD8295 /* Explosion.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; path = Explosion.scnp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 			children = (
 				26511B0E20E1E35900BD8295 /* spark.png */,
 				26511B0F20E1E35900BD8295 /* Fireball.scnp */,
+				26511B1220E3111C00BD8295 /* Explosion.scnp */,
 			);
 			path = Particles;
 			sourceTree = "<group>";
@@ -144,6 +147,7 @@
 			files = (
 				26511B1020E1E35900BD8295 /* spark.png in Resources */,
 				26511AF820E19D1B00BD8295 /* art.scnassets in Resources */,
+				26511B1320E3111C00BD8295 /* Explosion.scnp in Resources */,
 				26511B0220E19D1C00BD8295 /* LaunchScreen.storyboard in Resources */,
 				26511AFF20E19D1C00BD8295 /* Assets.xcassets in Resources */,
 				26511B1120E1E35900BD8295 /* Fireball.scnp in Resources */,
