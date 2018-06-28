@@ -17,17 +17,17 @@ enum BitMaskCategory: Int {
 }
 
 class ViewController: UIViewController {
-
-    @IBOutlet weak var sceneView: ARSCNView!
     var player: SCNNode?
     var spellNode = SCNNode()
     var wandNode = SCNNode()
     var projectileNode = SCNNode()
     var timer: Timer!
+    var score: Int = 0
     fileprivate var isCastingSpell: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupViews()
         setupWand()
         setupPlayerView()
         
@@ -39,6 +39,9 @@ class ViewController: UIViewController {
         //Repeatedly fire enemy projectiles
         timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) {(timer) in
             self.generateRandomProjectiles()
+            //Update score each time user dodges or intercepts a projectile
+            self.score += 1
+            self.scoreLabel.text = "\(self.score)"
         }
     }
     
@@ -62,6 +65,38 @@ class ViewController: UIViewController {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         //Remove the spell light when user stops holding
         useSpell()
+    }
+    
+    let sceneView: ARSCNView = {
+        let view = ARSCNView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    let scoreLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = UIColor.white
+        label.text = "0"
+        label.font = UIFont(name: "Helvetica", size: 50)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    fileprivate func setupViews() {
+        view.addSubview(sceneView)
+        view.addSubview(scoreLabel)
+        updateViewConstraints()
+    }
+    
+    override func updateViewConstraints() {
+        super.updateViewConstraints()
+        sceneView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        sceneView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        sceneView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        sceneView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        scoreLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        scoreLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8).isActive = true
     }
     
     fileprivate func setupWand() {
@@ -98,7 +133,6 @@ extension ViewController: SCNPhysicsContactDelegate {
             //If enemy projectile hit player
             handlePlayerHitCollision(contact: contact)
         }
-        
     }
 }
 
@@ -159,7 +193,7 @@ fileprivate extension ViewController {
         let nodeA = contact.nodeA
         let nodeB = contact.nodeB
         
-        createExplosion(at: contact.contactPoint, withSize: 0.01, duration: 0.25)
+        createExplosion(at: contact.contactPoint, withSize: 0.5, duration: 0.1, color: nil)
         nodeA.removeFromParentNode()
         nodeB.removeFromParentNode()
     }
@@ -179,11 +213,11 @@ fileprivate extension ViewController {
             //Remove spell node when hit
             nodeA.removeFromParentNode()
         }
-        createExplosion(at: contact.contactPoint, withSize: 0.1, duration: 2)
+        createExplosion(at: contact.contactPoint, withSize: 0.1, duration: 2, color: UIColor(rgb: 0x50FF2F))
         timer.invalidate()
     }
     
-    func createExplosion(at contactPoint: SCNVector3, withSize size: CGFloat, duration: CGFloat) {
+    func createExplosion(at contactPoint: SCNVector3, withSize size: CGFloat, duration: CGFloat, color: UIColor?) {
         //Create explosion at contact point of player
         let explosion = SCNParticleSystem(named: "Explosion.scnp", inDirectory: nil)!
         explosion.loops = false
@@ -192,6 +226,10 @@ fileprivate extension ViewController {
         let explosionNode = SCNNode()
         explosionNode.addParticleSystem(explosion)
         explosionNode.position = contactPoint
+        if let particleColor = color {
+            explosion.particleColor = particleColor
+            explosion.acceleration = SCNVector3(0, 4, 0)
+        }
         sceneView.scene.rootNode.addChildNode(explosionNode)
     }
     
@@ -200,7 +238,6 @@ fileprivate extension ViewController {
         let orientation = getCameraOrientation()
         let randomOffsetZ = -Int(arc4random_uniform(2) + UInt32(4))
         let randomOffsetVector = SCNVector3(0, 0, randomOffsetZ)
-        print(randomOffsetVector)
         projectileNode.position = randomOffsetVector
         let fire = SCNParticleSystem(named: "Avada Kedavra.scnp", inDirectory: nil)!
         fire.particleSize = 0.1
