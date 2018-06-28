@@ -12,31 +12,33 @@ import ARKit
 
 enum BitMaskCategory: Int {
     case spellNode = 1
-    case target = 2
+    case player = 2
+    case enemyProjectileNode = 3
 }
 
 class ViewController: UIViewController {
 
     @IBOutlet weak var sceneView: ARSCNView!
-    var target: SCNNode?
+    var player: SCNNode?
     var spellNode = SCNNode()
     var wandNode = SCNNode()
     var projectileNode = SCNNode()
+    var timer: Timer!
     fileprivate var isCastingSpell: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupWand()
-        generateRandomProjectiles()
+        setupPlayerView()
+        
         sceneView.delegate = self
         sceneView.scene.physicsWorld.contactDelegate = self
         sceneView.showsStatistics = true
         sceneView.autoenablesDefaultLighting = true
 
-        sceneView.pointOfView?.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(geometry: SCNPlane(width: 0.01, height: 0.01), options: nil))
-        sceneView.pointOfView?.physicsBody?.categoryBitMask = BitMaskCategory.target.rawValue
-        sceneView.pointOfView?.physicsBody?.contactTestBitMask = BitMaskCategory.spellNode.rawValue
-    
+        timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) {(timer) in
+            self.generateRandomProjectiles()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -69,6 +71,14 @@ class ViewController: UIViewController {
         wandNode.position = SCNVector3(0.1, -0.2, -0.8)
         sceneView.pointOfView?.addChildNode(wandNode)
     }
+    
+    fileprivate func setupPlayerView() {
+        //Set up physics body for player's point of view to receive collision events
+        sceneView.pointOfView?.physicsBody = SCNPhysicsBody(type: .static, shape: SCNPhysicsShape(geometry: SCNPlane(width: 0.01, height: 0.01), options: nil))
+        sceneView.pointOfView?.physicsBody?.categoryBitMask = BitMaskCategory.player.rawValue
+        sceneView.pointOfView?.physicsBody?.contactTestBitMask = BitMaskCategory.enemyProjectileNode.rawValue
+        sceneView.pointOfView?.physicsBody?.collisionBitMask = BitMaskCategory.enemyProjectileNode.rawValue
+    }
 }
 
 extension ViewController: ARSCNViewDelegate {
@@ -78,7 +88,16 @@ extension ViewController: ARSCNViewDelegate {
 
 extension ViewController: SCNPhysicsContactDelegate {
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
-        handleCollision(contact: contact)
+        let nodeA = contact.nodeA
+        let nodeB = contact.nodeB
+        if nodeA.physicsBody?.categoryBitMask != BitMaskCategory.player.rawValue && nodeB.physicsBody?.categoryBitMask != BitMaskCategory.player.rawValue {
+            //If neither bodies is the player, then the player spell and enemy projectile must have collided
+            handleProjectileCollision(contact: contact)
+        } else {
+            //If enemy projectile hit player
+            handlePlayerHitCollision(contact: contact)
+        }
+        
     }
 }
 
@@ -88,7 +107,7 @@ fileprivate extension ViewController {
         spellNode = SCNNode()
         spellNode.pivot = SCNMatrix4MakeTranslation(0, 0, 140)
         spellNode.physicsBody?.categoryBitMask = BitMaskCategory.spellNode.rawValue
-        spellNode.physicsBody?.contactTestBitMask = BitMaskCategory.target.rawValue
+        spellNode.physicsBody?.contactTestBitMask = BitMaskCategory.enemyProjectileNode.rawValue
         
         let fire = SCNParticleSystem(named: "Fireball.scnp", inDirectory: nil)!
         fire.particleSize = 0.1
@@ -135,48 +154,63 @@ fileprivate extension ViewController {
         }
     }
     
-    func handleCollision(contact: SCNPhysicsContact) {
-        //Determine which node is the target
+    func handleProjectileCollision(contact: SCNPhysicsContact) {
         let nodeA = contact.nodeA
         let nodeB = contact.nodeB
-        if nodeA.physicsBody?.categoryBitMask == BitMaskCategory.target.rawValue {
-            //If node A is the target
-            target = nodeA
+        
+        createExplosion(at: contact.contactPoint, withSize: 0.01, duration: 0.25)
+        nodeA.removeFromParentNode()
+        nodeB.removeFromParentNode()
+    }
+    
+    func handlePlayerHitCollision(contact: SCNPhysicsContact) {
+        //Determine which node is the player
+        let nodeA = contact.nodeA
+        let nodeB = contact.nodeB
+        if nodeA.physicsBody?.categoryBitMask == BitMaskCategory.player.rawValue {
+            //If node A is the player
+            player = nodeA
             //Remove spell node when hit
             nodeB.removeFromParentNode()
         } else {
-            //If node B is the target
-            target = nodeB
+            //If node B is the player
+            player = nodeB
             //Remove spell node when hit
             nodeA.removeFromParentNode()
         }
-        
-        //Create explosion at contact point of target
+        createExplosion(at: contact.contactPoint, withSize: 0.1, duration: 2)
+        timer.invalidate()
+    }
+    
+    func createExplosion(at contactPoint: SCNVector3, withSize size: CGFloat, duration: CGFloat) {
+        //Create explosion at contact point of player
         let explosion = SCNParticleSystem(named: "Explosion.scnp", inDirectory: nil)!
         explosion.loops = false
-        explosion.particleLifeSpan = 2
-        explosion.particleSize = 0.1
+        explosion.particleLifeSpan = duration
+        explosion.particleSize = size
         let explosionNode = SCNNode()
         explosionNode.addParticleSystem(explosion)
-        explosionNode.position = contact.contactPoint
+        explosionNode.position = contactPoint
         sceneView.scene.rootNode.addChildNode(explosionNode)
     }
     
     func generateRandomProjectiles() {
         //Create random projectiles that fire towards the camera position
-        let cameraPosition = getCameraPosition()
+        let cameraPos = getCameraPosition()
         let orientation = getCameraOrientation()
-        projectileNode.position = SCNVector3(cameraPosition.x*3, cameraPosition.y*3, cameraPosition.z*3)
+        projectileNode.position = SCNVector3(0, 0, -5)
         let fire = SCNParticleSystem(named: "Fireball.scnp", inDirectory: nil)!
-        fire.particleSize = 0.1
+        fire.particleSize = 0.2
         projectileNode.addParticleSystem(fire)
         
         let body = SCNPhysicsBody(type: .dynamic, shape: SCNPhysicsShape(node: projectileNode, options: nil))
-        body.applyForce(SCNVector3(-orientation.x, -orientation.y, -orientation.z), asImpulse: true)
+        body.applyForce(SCNVector3(-orientation.x*3, -orientation.y*3, -orientation.z*3), asImpulse: true)
         body.isAffectedByGravity = false
         projectileNode.physicsBody = body
+        projectileNode.physicsBody?.categoryBitMask = BitMaskCategory.enemyProjectileNode.rawValue
+        projectileNode.physicsBody?.contactTestBitMask = BitMaskCategory.player.rawValue | BitMaskCategory.spellNode.rawValue
         
-        sceneView.scene.rootNode.addChildNode(projectileNode)
+        sceneView.pointOfView?.addChildNode(projectileNode)
     }
 }
 
