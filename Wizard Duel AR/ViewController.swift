@@ -36,7 +36,8 @@ class ViewController: UIViewController {
         sceneView.showsStatistics = true
         sceneView.autoenablesDefaultLighting = true
 
-        timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) {(timer) in
+        //Repeatedly fire enemy projectiles
+        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) {(timer) in
             self.generateRandomProjectiles()
         }
     }
@@ -196,15 +197,17 @@ fileprivate extension ViewController {
     
     func generateRandomProjectiles() {
         //Create random projectiles that fire towards the camera position
-        let cameraPos = getCameraPosition()
         let orientation = getCameraOrientation()
-        projectileNode.position = SCNVector3(0, 0, -5)
+        let randomOffsetZ = -Int(arc4random_uniform(2) + UInt32(4))
+        let randomOffsetVector = SCNVector3(0, 0, randomOffsetZ)
+        print(randomOffsetVector)
+        projectileNode.position = randomOffsetVector
         let fire = SCNParticleSystem(named: "Fireball.scnp", inDirectory: nil)!
         fire.particleSize = 0.2
         projectileNode.addParticleSystem(fire)
         
         let body = SCNPhysicsBody(type: .dynamic, shape: SCNPhysicsShape(node: projectileNode, options: nil))
-        body.applyForce(SCNVector3(-orientation.x*3, -orientation.y*3, -orientation.z*3), asImpulse: true)
+        body.applyForce(SCNVector3(-orientation.x*4, -orientation.y*4, -orientation.z*4), asImpulse: true)
         body.isAffectedByGravity = false
         projectileNode.physicsBody = body
         projectileNode.physicsBody?.categoryBitMask = BitMaskCategory.enemyProjectileNode.rawValue
