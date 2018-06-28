@@ -17,6 +17,7 @@
 		26511B1020E1E35900BD8295 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 26511B0E20E1E35900BD8295 /* spark.png */; };
 		26511B1120E1E35900BD8295 /* Fireball.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 26511B0F20E1E35900BD8295 /* Fireball.scnp */; };
 		26511B1320E3111C00BD8295 /* Explosion.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 26511B1220E3111C00BD8295 /* Explosion.scnp */; };
+		26511B1520E3F5FD00BD8295 /* Dragon_Bump_Col2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 26511B1420E3F5FC00BD8295 /* Dragon_Bump_Col2.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		26511B0E20E1E35900BD8295 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		26511B0F20E1E35900BD8295 /* Fireball.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; path = Fireball.scnp; sourceTree = "<group>"; };
 		26511B1220E3111C00BD8295 /* Explosion.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; path = Explosion.scnp; sourceTree = "<group>"; };
+		26511B1420E3F5FC00BD8295 /* Dragon_Bump_Col2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Dragon_Bump_Col2.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 		26511AF420E19D1B00BD8295 /* Wizard Duel AR */ = {
 			isa = PBXGroup;
 			children = (
+				26511B1420E3F5FC00BD8295 /* Dragon_Bump_Col2.jpg */,
 				26511B0D20E1E2C700BD8295 /* Particles */,
 				26511AF520E19D1B00BD8295 /* AppDelegate.swift */,
 				26511AF720E19D1B00BD8295 /* art.scnassets */,
@@ -145,6 +148,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26511B1520E3F5FD00BD8295 /* Dragon_Bump_Col2.jpg in Resources */,
 				26511B1020E1E35900BD8295 /* spark.png in Resources */,
 				26511AF820E19D1B00BD8295 /* art.scnassets in Resources */,
 				26511B1320E3111C00BD8295 /* Explosion.scnp in Resources */,
