@@ -45,7 +45,7 @@ class ViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let configuration = ARWorldTrackingConfiguration()
-        sceneView.debugOptions = [SCNDebugOptions.showPhysicsShapes]
+        //sceneView.debugOptions = [SCNDebugOptions.showPhysicsShapes]
         sceneView.session.run(configuration)
     }
     
@@ -202,8 +202,8 @@ fileprivate extension ViewController {
         let randomOffsetVector = SCNVector3(0, 0, randomOffsetZ)
         print(randomOffsetVector)
         projectileNode.position = randomOffsetVector
-        let fire = SCNParticleSystem(named: "Fireball.scnp", inDirectory: nil)!
-        fire.particleSize = 0.2
+        let fire = SCNParticleSystem(named: "Avada Kedavra.scnp", inDirectory: nil)!
+        fire.particleSize = 0.1
         projectileNode.addParticleSystem(fire)
         
         let body = SCNPhysicsBody(type: .dynamic, shape: SCNPhysicsShape(node: projectileNode, options: nil))
