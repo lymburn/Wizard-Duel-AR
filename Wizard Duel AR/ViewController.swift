@@ -31,8 +31,7 @@ class ViewController: UIViewController {
         setupViews()
         setupWand()
         setupPlayerView()
-        
-        sceneView.delegate = self
+
         sceneView.scene.physicsWorld.contactDelegate = self
         sceneView.showsStatistics = true
         sceneView.autoenablesDefaultLighting = true
@@ -78,8 +77,30 @@ class ViewController: UIViewController {
         let label = UILabel()
         label.textColor = UIColor.white
         label.text = "0"
-        label.font = UIFont(name: "Helvetica", size: 50)
+        label.font = UIFont.systemFont(ofSize: 50, weight: UIFont.Weight.thin)
         label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    let bestScoreLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = UIColor.white
+        label.text = "BEST"
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 50, weight: UIFont.Weight.thin)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.alpha = 0
+        return label
+    }()
+    
+    let tapToRestartLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = UIColor.white
+        label.text = "TAP TO RESTART"
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 30, weight: UIFont.Weight.thin)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.alpha = 0
         return label
     }()
     
@@ -94,6 +115,8 @@ class ViewController: UIViewController {
         view.addSubview(sceneView)
         view.addSubview(scoreLabel)
         view.addSubview(skullImage)
+        view.addSubview(bestScoreLabel)
+        view.addSubview(tapToRestartLabel)
         updateViewConstraints()
     }
     
@@ -107,10 +130,20 @@ class ViewController: UIViewController {
         scoreLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
         scoreLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8).isActive = true
         
+        bestScoreLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8).isActive = true
+        bestScoreLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8).isActive = true
+        bestScoreLabel.bottomAnchor.constraint(equalTo: skullImage.topAnchor).isActive = true
+        bestScoreLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16).isActive = true
+        
         skullImage.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         skullImage.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        skullImage.widthAnchor.constraint(equalToConstant: screenSize.width*0.4).isActive = true
-        skullImage.heightAnchor.constraint(equalToConstant: screenSize.width*0.4).isActive = true
+        skullImage.widthAnchor.constraint(equalToConstant: screenSize.width*0.5).isActive = true
+        skullImage.heightAnchor.constraint(equalToConstant: screenSize.width*0.5).isActive = true
+        
+        tapToRestartLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8).isActive = true
+        tapToRestartLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 8).isActive = true
+        tapToRestartLabel.topAnchor.constraint(equalTo: skullImage.bottomAnchor, constant: 16).isActive = true
+        tapToRestartLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8).isActive = true
     }
     
     fileprivate func setupWand() {
@@ -128,11 +161,6 @@ class ViewController: UIViewController {
         sceneView.pointOfView?.physicsBody?.categoryBitMask = BitMaskCategory.player.rawValue
         sceneView.pointOfView?.physicsBody?.contactTestBitMask = BitMaskCategory.enemyProjectileNode.rawValue
         sceneView.pointOfView?.physicsBody?.collisionBitMask = BitMaskCategory.enemyProjectileNode.rawValue
-    }
-}
-
-extension ViewController: ARSCNViewDelegate {
-    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
     }
 }
 
@@ -234,6 +262,9 @@ fileprivate extension ViewController {
             //Show skull indicating player death
             UIView.animate(withDuration: 2) {
                 self.skullImage.alpha = 1
+                self.bestScoreLabel.alpha = 1
+                self.bestScoreLabel.text = "BEST \(self.score)"
+                self.tapToRestartLabel.alpha = 1
             }
         }
     }
@@ -276,15 +307,6 @@ fileprivate extension ViewController {
 }
 
 extension ViewController {
-    fileprivate func getCameraPosition() -> SCNVector3 {
-        let pointOfView = sceneView.pointOfView!
-        let transform = pointOfView.transform
-        let orientation = SCNVector3(-transform.m31, -transform.m32, -transform.m33)
-        let location = SCNVector3(transform.m41, transform.m42, transform.m43)
-        let position = orientation + location
-        return position
-    }
-    
     fileprivate func getCameraOrientation() -> SCNVector3 {
         let pointOfView = sceneView.pointOfView!
         let transform = pointOfView.transform
