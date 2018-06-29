@@ -23,7 +23,8 @@ class ViewController: UIViewController {
     var projectileNode = SCNNode()
     var timer: Timer!
     var score: Int = 0
-    fileprivate var isCastingSpell: Bool = false
+    let screenSize = UIScreen.main.bounds
+    var isCastingSpell: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,9 +83,17 @@ class ViewController: UIViewController {
         return label
     }()
     
+    let skullImage: UIImageView = {
+        let iv = UIImageView(image: UIImage(named: "Skull"))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.alpha = 0
+        return iv
+    }()
+    
     fileprivate func setupViews() {
         view.addSubview(sceneView)
         view.addSubview(scoreLabel)
+        view.addSubview(skullImage)
         updateViewConstraints()
     }
     
@@ -97,6 +106,11 @@ class ViewController: UIViewController {
         
         scoreLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
         scoreLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8).isActive = true
+        
+        skullImage.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        skullImage.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        skullImage.widthAnchor.constraint(equalToConstant: screenSize.width*0.4).isActive = true
+        skullImage.heightAnchor.constraint(equalToConstant: screenSize.width*0.4).isActive = true
     }
     
     fileprivate func setupWand() {
@@ -215,6 +229,13 @@ fileprivate extension ViewController {
         }
         createExplosion(at: contact.contactPoint, withSize: 0.1, duration: 2, color: UIColor(rgb: 0x50FF2F))
         timer.invalidate()
+        
+        DispatchQueue.main.async {
+            //Show skull indicating player death
+            UIView.animate(withDuration: 2) {
+                self.skullImage.alpha = 1
+            }
+        }
     }
     
     func createExplosion(at contactPoint: SCNVector3, withSize size: CGFloat, duration: CGFloat, color: UIColor?) {
