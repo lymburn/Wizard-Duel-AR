@@ -25,6 +25,7 @@ class ViewController: UIViewController {
     var score: Int = 0
     let screenSize = UIScreen.main.bounds
     var isCastingSpell: Bool = false
+    var playerIsAlive: Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +34,6 @@ class ViewController: UIViewController {
         setupPlayerView()
 
         sceneView.scene.physicsWorld.contactDelegate = self
-        sceneView.showsStatistics = true
         sceneView.autoenablesDefaultLighting = true
 
         //Repeatedly fire enemy projectiles
@@ -58,13 +58,20 @@ class ViewController: UIViewController {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //Draw channelling spell light
-        castSpell()
+        if playerIsAlive {
+            //Draw channelling spell light
+            castSpell()
+        } else {
+            //If player is on dead screen, restart game when tapped
+            restartGame()
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //Remove the spell light when user stops holding
-        useSpell()
+        if playerIsAlive {
+            //Remove the spell light when user stops holding
+            useSpell()
+        }
     }
     
     let sceneView: ARSCNView = {
@@ -267,6 +274,8 @@ fileprivate extension ViewController {
                 self.tapToRestartLabel.alpha = 1
             }
         }
+        //Set player state to dead
+        playerIsAlive = false
     }
     
     func createExplosion(at contactPoint: SCNVector3, withSize size: CGFloat, duration: CGFloat, color: UIColor?) {
@@ -303,6 +312,25 @@ fileprivate extension ViewController {
         projectileNode.physicsBody?.contactTestBitMask = BitMaskCategory.player.rawValue | BitMaskCategory.spellNode.rawValue
         
         sceneView.pointOfView?.addChildNode(projectileNode)
+    }
+    
+    func restartGame() {
+        score = 0
+        scoreLabel.text = "0"
+        //Hide death screen labels
+        bestScoreLabel.alpha = 0
+        tapToRestartLabel.alpha = 0
+        skullImage.alpha = 0
+        
+        //Restart firing projectiles
+        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) {(timer) in
+            self.generateRandomProjectiles()
+            //Update score each time user dodges or intercepts a projectile
+            self.score += 1
+            self.scoreLabel.text = "\(self.score)"
+        }
+        
+        playerIsAlive = true
     }
 }
 
