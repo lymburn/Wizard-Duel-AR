@@ -13,7 +13,7 @@
 		26511AFD20E19D1B00BD8295 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26511AFB20E19D1B00BD8295 /* Main.storyboard */; };
 		26511AFF20E19D1C00BD8295 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26511AFE20E19D1C00BD8295 /* Assets.xcassets */; };
 		26511B0220E19D1C00BD8295 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26511B0020E19D1C00BD8295 /* LaunchScreen.storyboard */; };
-		26511B0C20E1B81C00BD8295 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26511B0B20E1B81C00BD8295 /* Helpers.swift */; };
+		26511B0C20E1B81C00BD8295 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26511B0B20E1B81C00BD8295 /* Extensions.swift */; };
 		26511B1020E1E35900BD8295 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 26511B0E20E1E35900BD8295 /* spark.png */; };
 		26511B1120E1E35900BD8295 /* Fireball.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 26511B0F20E1E35900BD8295 /* Fireball.scnp */; };
 		26511B1320E3111C00BD8295 /* Explosion.scnp in Resources */ = {isa = PBXBuildFile; fileRef = 26511B1220E3111C00BD8295 /* Explosion.scnp */; };
@@ -29,7 +29,7 @@
 		26511AFE20E19D1C00BD8295 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		26511B0120E19D1C00BD8295 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		26511B0320E19D1C00BD8295 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		26511B0B20E1B81C00BD8295 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		26511B0B20E1B81C00BD8295 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		26511B0E20E1E35900BD8295 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		26511B0F20E1E35900BD8295 /* Fireball.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; path = Fireball.scnp; sourceTree = "<group>"; };
 		26511B1220E3111C00BD8295 /* Explosion.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; path = Explosion.scnp; sourceTree = "<group>"; };
@@ -73,7 +73,7 @@
 				26511AFE20E19D1C00BD8295 /* Assets.xcassets */,
 				26511B0020E19D1C00BD8295 /* LaunchScreen.storyboard */,
 				26511B0320E19D1C00BD8295 /* Info.plist */,
-				26511B0B20E1B81C00BD8295 /* Helpers.swift */,
+				26511B0B20E1B81C00BD8295 /* Extensions.swift */,
 				26511AF520E19D1B00BD8295 /* AppDelegate.swift */,
 			);
 			path = "Wizard Duel AR";
@@ -167,7 +167,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26511AFA20E19D1B00BD8295 /* ViewController.swift in Sources */,
-				26511B0C20E1B81C00BD8295 /* Helpers.swift in Sources */,
+				26511B0C20E1B81C00BD8295 /* Extensions.swift in Sources */,
 				26511AF620E19D1B00BD8295 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

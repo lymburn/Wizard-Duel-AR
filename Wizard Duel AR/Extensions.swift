@@ -1,5 +1,5 @@
 //
-//  Helpers.swift
+//  Extensions.swift
 //  Wizard Duel AR
 //
 //  Created by Eugene Lu on 2018-06-25.
@@ -7,10 +7,6 @@
 //
 
 import SceneKit
-
-func+ (lhs: SCNVector3, rhs: SCNVector3) -> SCNVector3 {
-    return SCNVector3(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z)
-}
 
 extension CGFloat {
     var degreesToRadians: CGFloat { return self * .pi / 180 }
@@ -36,5 +32,17 @@ extension UIColor {
             green: (rgb >> 8) & 0xFF,
             blue: rgb & 0xFF
         )
+    }
+}
+
+extension UserDefaults {
+    // check for is first launch - only true on first invocation after app install, false on all further invocations
+    static func isFirstLaunch() -> Bool {
+        let hasBeenLaunchedBeforeFlag = "hasBeenLaunchedBeforeFlag"
+        let isFirstLaunch = !UserDefaults.standard.bool(forKey: hasBeenLaunchedBeforeFlag)
+        if (isFirstLaunch) {
+            UserDefaults.standard.set(true, forKey: hasBeenLaunchedBeforeFlag)
+        }
+        return isFirstLaunch
     }
 }

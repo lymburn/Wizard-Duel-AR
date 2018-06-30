@@ -35,13 +35,28 @@ class ViewController: UIViewController {
 
         sceneView.scene.physicsWorld.contactDelegate = self
         sceneView.autoenablesDefaultLighting = true
-
-        //Repeatedly fire enemy projectiles
-        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) {(timer) in
-            self.generateRandomProjectiles()
-            //Update score each time user dodges or intercepts a projectile
-            self.score += 1
-            self.scoreLabel.text = "\(self.score)"
+        
+        //If user has already seen tutorial, start firing projectiles
+        if !UserDefaults.isFirstLaunch() {
+            instructionLabel.alpha = 0
+            scoreLabel.alpha = 1
+            startGame()
+        } else {
+            scoreLabel.alpha = 0
+        }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(willResignActive), name: .UIApplicationWillResignActive, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive), name: .UIApplicationDidBecomeActive, object: nil)
+    }
+    
+    @objc func willResignActive() {
+        timer.invalidate()
+        timer = nil
+    }
+    
+    @objc func didBecomeActive() {
+        if timer == nil {
+            startGame()
         }
     }
     
@@ -54,15 +69,24 @@ class ViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        print("back")
         sceneView.session.pause()
+        timer.invalidate()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if playerIsAlive {
+        print(instructionLabel.alpha)
+        if instructionLabel.alpha == 1.0 {
             //Draw channelling spell light
+            //If instruction label is shown, game is first launch
+            startGame()
+            scoreLabel.alpha = 1
+            instructionLabel.alpha = 0
             castSpell()
-        } else {
+        } else if playerIsAlive {
             //If player is on dead screen, restart game when tapped
+            castSpell()
+        } else if !playerIsAlive {
             restartGame()
         }
     }
@@ -111,6 +135,17 @@ class ViewController: UIViewController {
         return label
     }()
     
+    let instructionLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = UIColor.white
+        label.text = "Dodge the enemy spells or intercept them. Press and release to fire your own spells."
+        label.numberOfLines = 5
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 30, weight: UIFont.Weight.medium)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     let skullImage: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "Skull"))
         iv.translatesAutoresizingMaskIntoConstraints = false
@@ -124,6 +159,7 @@ class ViewController: UIViewController {
         view.addSubview(skullImage)
         view.addSubview(bestScoreLabel)
         view.addSubview(tapToRestartLabel)
+        view.addSubview(instructionLabel)
         updateViewConstraints()
     }
     
@@ -142,15 +178,29 @@ class ViewController: UIViewController {
         bestScoreLabel.bottomAnchor.constraint(equalTo: skullImage.topAnchor).isActive = true
         bestScoreLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16).isActive = true
         
+        let skullSize: CGFloat
+        if UIDevice.current.orientation == UIDeviceOrientation.landscapeLeft
+            || UIDevice.current.orientation == UIDeviceOrientation.landscapeRight {
+            //If landscape
+            skullSize = screenSize.height*0.5
+        } else {
+            //If portrait
+            skullSize = screenSize.width*0.5
+        }
+        
         skullImage.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         skullImage.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        skullImage.widthAnchor.constraint(equalToConstant: screenSize.width*0.5).isActive = true
-        skullImage.heightAnchor.constraint(equalToConstant: screenSize.width*0.5).isActive = true
+        skullImage.widthAnchor.constraint(equalToConstant: skullSize).isActive = true
+        skullImage.heightAnchor.constraint(equalToConstant: skullSize).isActive = true
         
         tapToRestartLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8).isActive = true
-        tapToRestartLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 8).isActive = true
+        tapToRestartLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8).isActive = true
         tapToRestartLabel.topAnchor.constraint(equalTo: skullImage.bottomAnchor, constant: 16).isActive = true
         tapToRestartLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8).isActive = true
+        
+        instructionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        instructionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
+        instructionLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: screenSize.height*0.2).isActive = true
     }
     
     fileprivate func setupWand() {
@@ -248,23 +298,21 @@ fileprivate extension ViewController {
     }
     
     func handlePlayerHitCollision(contact: SCNPhysicsContact) {
+        //Invalidate timer
+        timer.invalidate()
+        
         //Determine which node is the player
         let nodeA = contact.nodeA
         let nodeB = contact.nodeB
         if nodeA.physicsBody?.categoryBitMask == BitMaskCategory.player.rawValue {
             //If node A is the player
             player = nodeA
-            //Remove spell node when hit
-            nodeB.removeFromParentNode()
         } else {
             //If node B is the player
             player = nodeB
-            //Remove spell node when hit
-            nodeA.removeFromParentNode()
         }
         createExplosion(at: contact.contactPoint, withSize: 0.1, duration: 2, color: UIColor(rgb: 0x50FF2F))
-        timer.invalidate()
-        
+
         DispatchQueue.main.async {
             //Show skull indicating player death
             UIView.animate(withDuration: 2) {
@@ -272,10 +320,9 @@ fileprivate extension ViewController {
                 self.bestScoreLabel.alpha = 1
                 self.bestScoreLabel.text = "BEST \(self.score)"
                 self.tapToRestartLabel.alpha = 1
+                self.playerIsAlive = false
             }
         }
-        //Set player state to dead
-        playerIsAlive = false
     }
     
     func createExplosion(at contactPoint: SCNVector3, withSize size: CGFloat, duration: CGFloat, color: UIColor?) {
@@ -303,6 +350,7 @@ fileprivate extension ViewController {
         let fire = SCNParticleSystem(named: "Avada Kedavra.scnp", inDirectory: nil)!
         fire.particleSize = 0.1
         projectileNode.addParticleSystem(fire)
+        projectileNode.particleSystems?.first?.particleDiesOnCollision = true
         
         let body = SCNPhysicsBody(type: .dynamic, shape: SCNPhysicsShape(node: projectileNode, options: nil))
         body.applyForce(SCNVector3(-orientation.x*4, -orientation.y*4, -orientation.z*4), asImpulse: true)
@@ -310,11 +358,23 @@ fileprivate extension ViewController {
         projectileNode.physicsBody = body
         projectileNode.physicsBody?.categoryBitMask = BitMaskCategory.enemyProjectileNode.rawValue
         projectileNode.physicsBody?.contactTestBitMask = BitMaskCategory.player.rawValue | BitMaskCategory.spellNode.rawValue
+        projectileNode.physicsBody?.collisionBitMask = BitMaskCategory.spellNode.rawValue
         
         sceneView.pointOfView?.addChildNode(projectileNode)
     }
     
+    func startGame() {
+        //Repeatedly fire enemy projectiles
+        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) {(timer) in
+            self.generateRandomProjectiles()
+            //Update score each time user dodges or intercepts a projectile
+            self.score += 1
+            self.scoreLabel.text = "\(self.score)"
+        }
+    }
+    
     func restartGame() {
+        playerIsAlive = true
         score = 0
         scoreLabel.text = "0"
         //Hide death screen labels
@@ -323,14 +383,7 @@ fileprivate extension ViewController {
         skullImage.alpha = 0
         
         //Restart firing projectiles
-        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) {(timer) in
-            self.generateRandomProjectiles()
-            //Update score each time user dodges or intercepts a projectile
-            self.score += 1
-            self.scoreLabel.text = "\(self.score)"
-        }
-        
-        playerIsAlive = true
+        startGame()
     }
 }
 
