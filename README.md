@@ -17,4 +17,5 @@ Skills Practiced:
 • Learned how to import and animate 3D models in SceneKit  
 • Practiced audio playback with AVFoundation  
 
-The app can be found on https://itunes.apple.com/us/app/wizard-duel-ar/id1406203911?ls=1&mt=8
+App Store link:
+https://itunes.apple.com/us/app/wizard-duel-ar/id1406203911?ls=1&mt=8
